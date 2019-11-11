@@ -16,6 +16,7 @@ Packages we need:
 library(curl)
 library(MASS)
 library(candisc)
+library(ggplot2)
 ```
 
 
@@ -27,8 +28,12 @@ head(d)
 
 LDA
 ```{r}
-r <- lda(formula = Genus ~ Body_mass_male_mean, 
-         data = d)
-head(r)
+kamcoop.lda <- lda(formula = Genus ~ Body_mass_male_mean + Body_mass_female_mean + Mass_Dimorphism, data = d)
+head(kamcoop.lda)
+```
+Visualize it: 
+```{r}
+kam.lda.values <- predict(kamcoop.lda)
+ldahist(kam.lda.values$x[,1], g = Type)
 ```
 
