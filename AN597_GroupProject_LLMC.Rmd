@@ -10,3 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Christian is the coolest member of this group!
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
+head(d)
+```
