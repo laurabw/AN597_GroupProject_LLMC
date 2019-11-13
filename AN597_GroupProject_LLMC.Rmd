@@ -34,6 +34,6 @@ head(kamcoop.lda)
 Visualize it: 
 ```{r}
 kam.lda.values <- predict(kamcoop.lda)
-ldahist(kam.lda.values$x[,1], g = Type)
+ldahist(kam.lda.values$x[,1], g = Type) #not sure whta the "g = type" means but r doesnt like it 
 ```
 
