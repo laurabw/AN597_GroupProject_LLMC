@@ -24,16 +24,24 @@ library(ggplot2)
 f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 head(d)
+summary(d)
 ```
 
 LDA
 ```{r}
 kamcoop.lda <- lda(formula = Genus ~ Body_mass_male_mean + Body_mass_female_mean + Mass_Dimorphism, data = d)
-head(kamcoop.lda)
+kamcoop.lda
 ```
-Visualize it: 
+The coefficient here is super small, but I'm not sure what this means.
+
+Predict function generate value from selected model function. The length of the value predicted will be correspond with the length of the processed data.
 ```{r}
-kam.lda.values <- predict(kamcoop.lda)
-ldahist(kam.lda.values$x[,1], g = Type) #not sure whta the "g = type" means but r doesnt like it 
+lda.predict <- predict(kamcoop.lda)
+lda.predict
+#ldahist(lda.predict) #there should be an argument g = and I'm not sure what it should be set to (should be an object). It should make histograms of the lda results
+```
+Making a scatter plot- this is a direct copy and paste from the wine data example that I will change later: 
+```{r}
+plot(lda.predict$x[,1], lda.predict$x[,2])
 ```
 
