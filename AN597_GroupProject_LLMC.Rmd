@@ -25,23 +25,41 @@ f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/m
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 head(d)
 summary(d)
+plot(d[,c(8,9)],
+     col=d[,2]) #plot female and male brain size, with different colors being different families (families seem to group together a bit better, and there arent as many as the number of genera) 
 ```
 
 LDA
 ```{r}
-kamcoop.lda <- lda(formula = Genus ~ Body_mass_male_mean + Body_mass_female_mean + Mass_Dimorphism, data = d)
+kamcoop.lda <- lda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) #categorical dependent variable is family 
 kamcoop.lda
 ```
-The coefficient here is super small, but I'm not sure what this means.
+Output gives: group means, LD coefficients (lines that actually discriminate between the variables), prior proabbilities of groups (what proportion of the data seemed to be in each group prior to starting)
 
-Predict function generate value from selected model function. The length of the value predicted will be correspond with the length of the processed data.
+Predict function generate value from selected model function. The length of the value predicted will be correspond with the length of the processed data. 
 ```{r}
-lda.predict <- predict(kamcoop.lda)
-lda.predict
-#ldahist(lda.predict) #there should be an argument g = and I'm not sure what it should be set to (should be an object). It should make histograms of the lda results
+lda.predict.class <- predict(kamcoop.lda,
+                       newdata=d[,c(8,9)]
+                       )$class #find prediction values of class
+lda.predict.class #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(lda.predict.class, d[,2])
+```
+
+Changing the data so that the genus names are numeric, so then maybe the histograms will work...
+```{r}
+unlist(d$Genus) #turning this variable into a vector
+as.numeric(d$Genus) #Giving each name a numeric value
+kamcoop.lda <- lda(formula = Genus ~ Body_mass_male_mean + Body_mass_female_mean + Mass_Dimorphism, data = d) #run the analysis now that I've changed the data
+head(kamcoop.lda)
+ldahist(lda.predict, g = d$Genus)
 ```
 Making a scatter plot- this is a direct copy and paste from the wine data example that I will change later: 
 ```{r}
-plot(lda.predict$x[,1], lda.predict$x[,2])
+lda.predict <- predict(kamcoop.lda)
+newdata <- data.frame(Family = d[,2], lda = lda.predict$x) 
+#Error in data.frame(Family = d[, 2], lda = lda.predict$x) : arguments imply differing number of rows: 213, 195
+library(ggplot2)
+ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, Lda.LD3, colour = type), size = 2.5)
 ```
 
