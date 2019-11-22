@@ -63,3 +63,11 @@ library(ggplot2)
 ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, Lda.LD3, colour = type), size = 2.5)
 ```
 
+CDA code
+```{r}
+df<- curl("https://github.com/laurabw/AN597_GroupProject_LLMC/blob/master/USArrests_data_NEW.csv")
+crimes<- read.csv(df, header = T, sep = ",", stringsAsFactors = F) #For some reason this isn't working....
+head(crimes)
+
+```
+
