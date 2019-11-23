@@ -17,6 +17,7 @@ library(curl)
 library(MASS)
 library(candisc)
 library(ggplot2)
+library(klaR)
 ```
 
 
@@ -62,6 +63,32 @@ newdata <- data.frame(Family = d[,2], lda = lda.predict$x)
 library(ggplot2)
 ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, Lda.LD3, colour = type), size = 2.5)
 ```
+
+QDA code
+#Quadratic Discriminant Analysis
+
+```{r}
+x <- read.csv("/Users/christiangagnon/Documents/GitHub/AN597_GroupProject_LLMC/kamcoop.simplified.2.csv", header = TRUE, sep = ",", stringsAsFactors = TRUE)
+head(x)
+summary(x)
+```
+
+```{r}
+qda.m1 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = x)
+qda.m1
+```
+
+
+```{r}
+partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = x, method="qda")
+```
+
+```{r}
+qda.x <- predict(qda.m1)
+x$qda <- qda.x$class
+table(x$qda,x$Family)
+```
+
 
 CDA code
 ```{r}
