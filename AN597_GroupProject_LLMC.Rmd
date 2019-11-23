@@ -187,7 +187,7 @@ head(Wine)
 levels(Wine$Cultivar) #these are the categories of our independent variable... the three types of wine
 ```
 
-Since this dataset is also not normally distributed, we are going to use the log transformation of the **most* normally distributed variables: Alcohol, Akalinity of Ash, and Color. 
+Since this dataset is also not normally distributed, we are going to use the log transformation of the **most** normally distributed variables: Alcohol, Akalinity of Ash, and Color. 
 ```{r}
 par(mfrow = c(1,2))
 hist(log(Wine$Alcohol))
