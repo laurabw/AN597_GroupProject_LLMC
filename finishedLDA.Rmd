@@ -113,3 +113,113 @@ ggplot(newdata.3) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.
 So with all of these variables, we are able to say that body mass and brain size can describe Cebidae out of these three families, but not the other two because they are too similar. 
 
 
+##QDA##
+
+(Insert info and pics in google drive)
+
+Packages we need: 
+```{r}
+library(curl)
+library(MASS)
+library(ggplot2)
+library(klaR)
+library(tidyverse)
+```
+
+
+##CHALLENGE##
+
+Similar to what we did for LDA, we will now try to use QDA to try to determine which of our variables is the best predictor of which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
+
+```{r}
+f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
+head(d)
+summary(d)
+str(d)
+```
+
+Now lets take a more expansive look at our data to see if our other variable differ between groups. 
+```{r}
+plot(d$Family, d$Body_mass_female_mean, main = "Mean Female Body Mass", ylab = "Body Mass (g)")
+plot(d$Family, d$Brain_Size_Species_Mean, main = "Mean Species Brain Size", ylab = "Brain Size (g)")
+plot(d$Family, d$Brain_Size_Female_Mean, main = "Mean Female Brain Size", ylab = "Brain Size (g)")
+plot(d$Family, d$Mass_Dimorphism, main = "Sexual Dimorphism in Mass", ylab = "Sexual Dimorphism")
+```
+```{r}
+scatterplotMatrix(~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism| Family, data=d,legend = TRUE,smooth = list(method=gamLine),diagonal = TRUE,plot.points = TRUE)
+?scatterplotMatrix
+```
+
+Most of our variables appear to be noticebly different between families but lets investigate further with QDA to see if one is a better predictor than the others. Instead of using the lda(), here we need to use the qda() wrapper which is also a function of the MASS package. We can start with model that includes all of our variables and we can simplify later if need be.
+
+```{r}
+kamcoop.qda <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = d) #categorical dependent variable is family 
+kamcoop.qda
+```
+
+#QDA Partition Plots
+
+```{r}
+partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = x, method="qda")
+```
+
+#QDA Predictions
+```{r}
+qda.predict <- predict(kamcoop.qda)
+qda.predict
+```
+
+```{r}
+qda.predict.class <- predict(kamcoop.qda,
+                       newdata=d[,c(5,6,7,8,9)]
+                       )$class #find prediction values of class
+qda.predict.class #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(qda.predict.class, d[,2])
+``` 
+Our model correctly predicted the family 100% of the time. This appaers to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
+```{r}
+kamcoop.qda1 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
+qda.predict.class1 <- predict(kamcoop.qda1,
+                       newdata=d[,c(5,6,7,8)]
+                       )$class #find prediction values of class
+qda.predict.class1 #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(qda.predict.class1, d[,2])
+``` 
+
+```{r}
+kamcoop.qda2 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean, data = d) 
+qda.predict.class2 <- predict(kamcoop.qda2,
+                       newdata=d[,c(5,7,8)]
+                       )$class #find prediction values of class
+qda.predict.class2 #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(qda.predict.class2, d[,2])
+``` 
+
+```{r}
+kamcoop.qda3 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) 
+qda.predict.class3 <- predict(kamcoop.qda3,
+                       newdata=d[,c(7,8)]
+                       )$class #find prediction values of class
+qda.predict.class3 #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(qda.predict.class3, d[,2])
+```
+
+```{r}
+kamcoop.qda4 <- qda(Family ~ Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
+qda.predict.class4 <- predict(kamcoop.qda4,
+                       newdata=d[,c(5,6)]
+                       )$class #find prediction values of class
+qda.predict.class4 #gives the classifications that are in the predictions
+#determine how well the model fits by comparing predictions to 
+table(qda.predict.class4, d[,2])
+```
+
+It looks as though our best and simplest model is:
+
+Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean
+
