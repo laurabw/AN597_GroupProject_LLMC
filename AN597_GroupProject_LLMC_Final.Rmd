@@ -56,3 +56,39 @@ The LDA returns and output giving scores that define the weight to how much the 
 
 \[ \delta_i (X) = - \frac{1}{2} \mu_i^T \Sigma^{-1}  X + ln(\pi_i)\]
 
+* **δ** is the discriminant score for class **i**
+* **X** is the matrix of independent variables
+* **μ** is a vector containing the means of each variable for class **i**
+* **Σ** is the covariance matrix of the variables (assumed to be the same for all classes)
+* **π** is the prior probability that an observation belongs to class **i**
+
+But why would we ever do this by hand when we have the lovely lda() function in the {MASS} ***R*** package?!
+
+<img src = "https://www.lostandfoundnature.com/wp-content/uploads/Blog/Spreadwing_damselfly/Lagothrix-flavicauda-yellow-tailed-woolly-monkey-Andrew-WalmsleyNPC-3-1024x680.jpg">
+
+We can use the Kamilar and Cooper data set to take a look at how this works. Let's load this data in first:
+
+```{r}
+library(curl)
+f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
+head(d)
+summary(d)
+plot(d[,c(8,9)],
+     col=d[,2]) #plot female and male brain size, with different colors being different families (families seem to group together a bit better, and there arent as many as the number of genera) 
+```
+
+Now we can try the lda() function:
+
+```{r}
+library(MASS)
+kamcoop.lda <- lda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) #categorical dependent variable is family 
+kamcoop.lda
+```
+
+Output gives: group means, LD coefficients (lines that actually discriminate between the variables), prior probabilities of groups (what proportion of the data seemed to be in each group prior to starting).
+
+The predict() function generates a value from a selected model function. The length of the value predicted will correspond with the length of the processed data. 
+
+
+<img src = "https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif">
