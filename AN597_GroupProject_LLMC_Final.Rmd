@@ -78,7 +78,8 @@ library(ggplot2)
 We can use the Kamilar and Cooper data set to take a look at how this works. We're going to use the Kamala and Cooper dataset, but, for the sake of simplicity, this dataset only includes the primate families Atelidae, Cebidae, and two genera of Cercopithecidae (macaques and mandrills). The dataset also includes five numeric variables: mean species brain size, mean female brain size, mean male body mass, mean female body mass, and mass dimorphism. Furthermore, we took out any species within these families that did not have values for any of the variables. Let's load this data in first:
 
 ```{r}
-f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
+f <- curl("https://raw.githubusercontent.com/laurabw/
+          AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 head(d)
 summary(d)
@@ -89,7 +90,8 @@ This simple boxplot just shows what we will be looking for in the LDA; in terms 
 
 Now we're going to look for this difference in body mass (male and female) using an LDA. We will do this by simply running the lda() wrapper function from the MASS package. 
 ```{r}
-kamcoop.lda <- lda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) #categorical dependent variable is family 
+kamcoop.lda <- lda(Family ~ Body_mass_male_mean + 
+                     Body_mass_female_mean, data = d) #categorical dependent variable is family 
 kamcoop.lda
 ```
 Output gives: group means, LD coefficients (lines that actually discriminate between the variables), prior proabilities of groups (what proportion of the data seemed to be in each group prior to starting), the proportion of trace is the percentage of separation achieved by each discriminant function (91% and 8%).
@@ -130,18 +132,21 @@ Making a scatter plot:
 newdata <- data.frame(Family = d[,2], lda = lda.predict$x) #make a dataframe with the familiy names and predicts LDs
 newdata
 library(ggplot2)
-ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.5)
+ggplot(newdata) + geom_point(aes(lda.LD1, lda.LD2, colour = Family),
+                             size = 2.5)
 ```
 They are kind of on top of each other, so I'm going to try to add another variable, mass dimorphism, which we can use the same dataset: 
 
 ```{r}
-kamcoop.lda.2 <- lda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Mass_Dimorphism, data = d) #categorical dependent variable is family 
+kamcoop.lda.2 <- lda(Family ~ Body_mass_male_mean + Body_mass_female_mean
+                     + Mass_Dimorphism, data = d) #categorical dependent variable is family 
 lda.predict.2 <- predict(kamcoop.lda.2)
 lda.predict.2
 newdata.2 <- data.frame(Family = d[,2], lda = lda.predict.2$x) 
 newdata.2 #3 LD because 3 variables?
 library(ggplot2)
-ggplot(newdata.2) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.5) 
+ggplot(newdata.2) + geom_point(aes(lda.LD1, lda.LD2, colour = Family),
+                               size = 2.5) 
 ```
 There is a little bit of differentiation between Cebidae and the other two families. This makes sense because Cebidae includes capuchins and squirrel monkeys, which are pretty small in comparison to atelids and cercopithecids.
 
@@ -153,7 +158,8 @@ lda.predict.3 <- predict(kamcoop.lda.3)
 lda.predict.3
 newdata.3 <- data.frame(Family = d[,2], lda = lda.predict.2$x) 
 newdata.3 
-ggplot(newdata.3) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.5) 
+ggplot(newdata.3) + geom_point(aes(lda.LD1, lda.LD2, colour = Family),
+                               size = 2.5) 
 ```
 
 So with all of these variables, we are able to say that body mass and brain size can describe Cebidae out of these three families, but not the other two because they are too similar. 
@@ -169,6 +175,7 @@ library(curl)
 library(MASS)
 library(ggplot2)
 library(klaR)
+library(car)
 ```
 
 
@@ -177,33 +184,44 @@ library(klaR)
 Similar to what we did for LDA, we will now try to use QDA to try to determine which of our variables is the best predictor of which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
 
 ```{r}
-f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
+f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC
+          /master/kamcoop.simplified.2.csv")
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 ```
 
 Now lets take a more expansive look at our data to see if our other variable differ between groups. 
 ```{r}
-plot(d$Family, d$Body_mass_female_mean, main = "Mean Female Body Mass", ylab = "Body Mass (g)")
-plot(d$Family, d$Brain_Size_Species_Mean, main = "Mean Species Brain Size", ylab = "Brain Size (g)")
-plot(d$Family, d$Brain_Size_Female_Mean, main = "Mean Female Brain Size", ylab = "Brain Size (g)")
-plot(d$Family, d$Mass_Dimorphism, main = "Sexual Dimorphism in Mass", ylab = "Sexual Dimorphism")
+plot(d$Family, d$Body_mass_female_mean, main = "Mean Female Body Mass",
+     ylab = "Body Mass (g)")
+plot(d$Family, d$Brain_Size_Species_Mean, main = "Mean Species Brain Size",
+     ylab = "Brain Size (g)")
+plot(d$Family, d$Brain_Size_Female_Mean, main = "Mean Female Brain Size",
+     ylab = "Brain Size (g)")
+plot(d$Family, d$Mass_Dimorphism, main = "Sexual Dimorphism in Mass",
+     ylab = "Sexual Dimorphism")
 ```
 ```{r}
-scatterplotMatrix(~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism| Family, data=d,legend = TRUE,smooth = list(method=gamLine),diagonal = TRUE,plot.points = TRUE)
-?scatterplotMatrix
+scatterplotMatrix(~ Body_mass_male_mean + Body_mass_female_mean + 
+                    Brain_Size_Species_Mean + Brain_Size_Female_Mean + 
+                    Mass_Dimorphism| Family, data=d,legend = TRUE,
+                  smooth = list(method=gamLine),diagonal = TRUE,plot.points = TRUE)
 ```
 
 Most of our variables appear to be noticebly different between families but lets investigate further with QDA to see if one is a better predictor than the others. Instead of using the lda(), here we need to use the qda() wrapper which is also a function of the MASS package. We can start with model that includes all of our variables and we can simplify later if need be.
 
 ```{r}
-kamcoop.qda <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = d) #categorical dependent variable is family 
+kamcoop.qda <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean +
+                     Brain_Size_Species_Mean + Brain_Size_Female_Mean +
+                     Mass_Dimorphism, data = d) #categorical dependent variable is family 
 kamcoop.qda
 ```
 
 #QDA Partition Plots
 
 ```{r}
-partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = x, method="qda")
+partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean +
+           Brain_Size_Species_Mean + Brain_Size_Female_Mean +
+           Mass_Dimorphism, data = d, method="qda")
 ```
 
 #QDA Predictions
@@ -225,7 +243,9 @@ table(qda.predict.class, d[,2])
 Our model correctly predicted the family 100% of the time. This appaers to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
 
 ```{r}
-kamcoop.qda1 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
+kamcoop.qda1 <- qda(Family ~ Body_mass_male_mean + 
+                      Body_mass_female_mean + Brain_Size_Species_Mean + 
+                      Brain_Size_Female_Mean, data = d) 
 qda.predict.class1 <- predict(kamcoop.qda1,
                        newdata=d[,c(5,6,7,8)]
                        )$class #find prediction values of class
@@ -235,7 +255,9 @@ table(qda.predict.class1, d[,2])
 ``` 
 
 ```{r}
-kamcoop.qda2 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean, data = d) 
+kamcoop.qda2 <- qda(Family ~ Body_mass_male_mean + 
+                      Body_mass_female_mean + 
+                      Brain_Size_Species_Mean, data = d) 
 qda.predict.class2 <- predict(kamcoop.qda2,
                        newdata=d[,c(5,7,8)]
                        )$class #find prediction values of class
@@ -245,7 +267,8 @@ table(qda.predict.class2, d[,2])
 ``` 
 
 ```{r}
-kamcoop.qda3 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) 
+kamcoop.qda3 <- qda(Family ~ Body_mass_male_mean + 
+                      Body_mass_female_mean, data = d) 
 qda.predict.class3 <- predict(kamcoop.qda3,
                        newdata=d[,c(7,8)]
                        )$class #find prediction values of class
@@ -255,7 +278,8 @@ table(qda.predict.class3, d[,2])
 ```
 
 ```{r}
-kamcoop.qda4 <- qda(Family ~ Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
+kamcoop.qda4 <- qda(Family ~ Brain_Size_Species_Mean + 
+                      Brain_Size_Female_Mean, data = d) 
 qda.predict.class4 <- predict(kamcoop.qda4,
                        newdata=d[,c(5,6)]
                        )$class #find prediction values of class
