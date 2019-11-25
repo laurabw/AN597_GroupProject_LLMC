@@ -78,13 +78,12 @@ library(ggplot2)
 We can use the Kamilar and Cooper data set to take a look at how this works. We're going to use the Kamala and Cooper dataset, but, for the sake of simplicity, this dataset only includes the primate families Atelidae, Cebidae, and two genera of Cercopithecidae (macaques and mandrills). The dataset also includes five numeric variables: mean species brain size, mean female brain size, mean male body mass, mean female body mass, and mass dimorphism. Furthermore, we took out any species within these families that did not have values for any of the variables. Let's load this data in first:
 
 ```{r}
-library(curl)
-f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 head(d)
 summary(d)
-plot(d[,c(8,9)],
-     col=d[,2]) #plot female and male brain size, with different colors being different families (families seem to group together a bit better, and there arent as many as the number of genera) 
+str(d) # There are 3 different families, this is probably what we will use for the analysis
+plot(d$Family, d$Body_mass_male_mean) #plot mass and male body mass so we can start to see what differences we may be looking for 
 ```
 This simple boxplot just shows what we will be looking for in the LDA; in terms of male body mass, Cercopithecidae and Atelidae are close to one another, but species within Cebidae are a bit smaller. 
 
