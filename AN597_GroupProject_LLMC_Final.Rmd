@@ -55,3 +55,4 @@ The LDA returns and output giving scores that define the weight to how much the 
 
 
 \[ \delta_i (X) = - \frac{1}{2} \mu_i^T \Sigma^{-1}  X + ln(\pi_i)\]
+
