@@ -157,10 +157,9 @@ ggplot(newdata.3) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.
 ```
 
 So with all of these variables, we are able to say that body mass and brain size can describe Cebidae out of these three families, but not the other two because they are too similar. 
+## Quadratic Discriminant Analysis (QDA)
 
-
-##QDA##
-
+Just like ANOVA, Linear Discriminant Analyses assumes equal variance between our input variables. If the data fails to meet this criteria, observation are more likely to be assigned to the class showing the greatest variability. This type of bias error is the reason the Quadratic Discriminant Analysis (QDA) was invented.
 (Insert info and pics in google drive)
 
 Packages we need: 
