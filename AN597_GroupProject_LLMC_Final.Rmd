@@ -222,7 +222,7 @@ qda.predict.class #gives the classifications that are in the predictions
 table(qda.predict.class, d[,2])
 ``` 
 
-Our model correctly predicted the family 100% of the time. This appaers to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
+Our model correctly predicted the correct family 100% of the time. This appears to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
 
 ```{r}
 kamcoop.qda1 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
