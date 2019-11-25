@@ -67,7 +67,7 @@ But why would we ever do this by hand when we have the lovely lda() function in 
 
 <img src = "https://www.lostandfoundnature.com/wp-content/uploads/Blog/Spreadwing_damselfly/Lagothrix-flavicauda-yellow-tailed-woolly-monkey-Andrew-WalmsleyNPC-3-1024x680.jpg">
 
-# CHALLENGE
+# LDA CHALLENGE
 
 Packages we need: 
 ```{r}
@@ -192,7 +192,7 @@ library(car)
 ```
 
 
-# CHALLENGE
+# QDA CHALLENGE
 
 Similar to what we did for LDA, we will now try to use QDA to try to determine which of our variables is the best predictor of which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
 
@@ -208,6 +208,7 @@ plot(d$Family, d$Brain_Size_Species_Mean, main = "Mean Species Brain Size", ylab
 plot(d$Family, d$Brain_Size_Female_Mean, main = "Mean Female Brain Size", ylab = "Brain Size (g)")
 plot(d$Family, d$Mass_Dimorphism, main = "Sexual Dimorphism in Mass", ylab = "Sexual Dimorphism")
 ```
+Another way we can visualize the variation in our data is using the scatterplotMatrix() wrapper function from the *car* package.
 ```{r}
 scatterplotMatrix(~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism| Family, data=d,legend = TRUE,smooth = list(method=gamLine),diagonal = TRUE,plot.points = TRUE)
 ```
@@ -221,17 +222,20 @@ kamcoop.qda
 
 #QDA Partition Plots
 
+Next we can use the partimat() function from the *klaR* package which allows us to plot the results of the *QDA*. This will create a figure for every possible combination of two variables from our data. 
 ```{r}
 partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism, data = d, method="qda")
 ```
+Think of each of these plots as a different prespective on our data. The different colored regions outline each classification area. Observation that falls within a region is predicted to be from a specific class. The apparent error rate at the top of each figure imforms us about how many observations fall outside their predicted range.
 
 #QDA Predictions
+
+The predict function works identically to the way we used it for *LDA*. We will again use this function to create a confusion matrix for our data.
 ```{r}
 qda.predict <- predict(kamcoop.qda)
 qda.predict
 ```
-
-
+This doesn't tell us much. Let's create a matrix like we did with *LDA*.
 ```{r}
 qda.predict.class <- predict(kamcoop.qda,
                        newdata=d[,c(5,6,7,8,9)]
@@ -243,6 +247,9 @@ table(qda.predict.class, d[,2])
 
 Our model correctly predicted the correct family 100% of the time. This appears to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
 
+Lets test some other modeling options!
+
+Removing Mass_Dimorphism:
 ```{r}
 kamcoop.qda1 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
 qda.predict.class1 <- predict(kamcoop.qda1,
@@ -252,7 +259,9 @@ qda.predict.class1 #gives the classifications that are in the predictions
 #determine how well the model fits by comparing predictions to 
 table(qda.predict.class1, d[,2])
 ``` 
+Still looking good!
 
+Now lets try without Mass_Dimorphism and Brain_Size_Female_Mean.
 ```{r}
 kamcoop.qda2 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean, data = d) 
 qda.predict.class2 <- predict(kamcoop.qda2,
@@ -262,7 +271,9 @@ qda.predict.class2 #gives the classifications that are in the predictions
 #determine how well the model fits by comparing predictions to 
 table(qda.predict.class2, d[,2])
 ``` 
+Still 100%
 
+Now we try with just Male and Female body mass.
 ```{r}
 kamcoop.qda3 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean, data = d) 
 qda.predict.class3 <- predict(kamcoop.qda3,
@@ -272,7 +283,9 @@ qda.predict.class3 #gives the classifications that are in the predictions
 #determine how well the model fits by comparing predictions to 
 table(qda.predict.class3, d[,2])
 ```
+And now we see we are starting to lose accuracy.
 
+One more combo just for the sake of being thorough without body mas or sexual dimorphism.
 ```{r}
 kamcoop.qda4 <- qda(Family ~ Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
 qda.predict.class4 <- predict(kamcoop.qda4,
@@ -282,9 +295,12 @@ qda.predict.class4 #gives the classifications that are in the predictions
 #determine how well the model fits by comparing predictions to 
 table(qda.predict.class4, d[,2])
 ```
+Not very good!
 
 It looks as though our best and simplest model is:
 
 Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean
+
+As such, we can use this model and QDA to predict how an unknown sample should be classified into one of our three Families of primates.
 
 <img src = "https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif">
