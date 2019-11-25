@@ -23,6 +23,7 @@ For this module, you will need to install the following packages:
 * {ggplot2}
 * {klaR}
 * {mvnormtest}
+* {car}
 
 # Objectives
 
@@ -165,8 +166,8 @@ Just like ANOVA, Linear Discriminant Analyses(LDA) assumes equal variance betwee
 <img src = "https://scikit-learn.org/dev/_images/sphx_glr_plot_lda_qda_0011.png">
 
 
-*Top row: when the covariance matrices are indeed the same in the data, LDA and QDA lead to the same decision boundaries.
-*Bottom row: when the covariance matrices are different, LDA leads to bad performance as its assumption becomes invalid, while QDA performs classification much better.
+* Top row: when the covariance matrices are indeed the same in the data, LDA and QDA lead to the same decision boundaries.
+* Bottom row: when the covariance matrices are different, LDA leads to bad performance as its assumption becomes invalid, while QDA performs classification much better.
 
 Both *LDA* and *QDA* can be derived from the same probabilistic models that models the class conditional distribution of the data $P(X|y=k)$ for each class $k$. *QDA* provides an alternative approach by assuming that each class has its own covariance matrix $\Sigma_k$.
 In order to calculate the quadratic boundary we use the following equation:
