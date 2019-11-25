@@ -67,7 +67,7 @@ But why would we ever do this by hand when we have the lovely lda() function in 
 
 <img src = "https://www.lostandfoundnature.com/wp-content/uploads/Blog/Spreadwing_damselfly/Lagothrix-flavicauda-yellow-tailed-woolly-monkey-Andrew-WalmsleyNPC-3-1024x680.jpg">
 
-##Challenge##
+# CHALLENGE
 
 Packages we need: 
 ```{r}
@@ -192,7 +192,7 @@ library(car)
 ```
 
 
-##CHALLENGE##
+# CHALLENGE
 
 Similar to what we did for LDA, we will now try to use QDA to try to determine which of our variables is the best predictor of which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
 
