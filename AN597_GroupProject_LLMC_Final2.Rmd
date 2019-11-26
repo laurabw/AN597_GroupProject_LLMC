@@ -319,3 +319,4 @@ Time to load in some data! To all my true crime lovers out there...
 Load in the USA Arrests dataset, which shows number of arrests per 100,000 residents for assault, murder, and burglary in each of the 50 US states in 1973 as well as the percentage of residents living in urban areas in each state. (This dataset has been modified)
 
 <img src = "https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif">
+
