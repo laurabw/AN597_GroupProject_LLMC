@@ -180,7 +180,7 @@ In order to calculate the quadratic boundary we use the following equation:
 * **Σ** is the covariance matrix of the variables (assumed to be the same for all classes)
 * **π** is the prior probability that an observation belongs to class **k**
 
-Let do a little exercise to see how *QDA* can be applied to our simplified Kamilar and Cooper dataset and how it differs from *LDA*.
+Let's do a little exercise to see how *QDA* can be applied to our simplified Kamilar and Cooper dataset and how it differs from *LDA*.
 
 Packages we need: 
 ```{r}
@@ -194,21 +194,21 @@ library(car)
 
 # QDA CHALLENGE
 
-Similar to what we did for LDA, we will now try to use QDA to try to determine which of our variables is the best predictor of which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
+Similar to what we did for LDA, we will now try to use QDA to try to determine which of variable or combination of variables will give us the best predictor model for which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
 
 ```{r}
 f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
 d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = TRUE)
 ```
 
-Now lets take a more expansive look at our data to see if our other variable differ between groups. 
+Now lets take a more expansive look at our data to see if our other variables differ between groups. 
 ```{r}
 plot(d$Family, d$Body_mass_female_mean, main = "Mean Female Body Mass", ylab = "Body Mass (g)")
 plot(d$Family, d$Brain_Size_Species_Mean, main = "Mean Species Brain Size", ylab = "Brain Size (g)")
 plot(d$Family, d$Brain_Size_Female_Mean, main = "Mean Female Brain Size", ylab = "Brain Size (g)")
 plot(d$Family, d$Mass_Dimorphism, main = "Sexual Dimorphism in Mass", ylab = "Sexual Dimorphism")
 ```
-Another way we can visualize the variation in our data is using the scatterplotMatrix() wrapper function from the *car* package.
+Another way we can visualize the variation in our data is by using the scatterplotMatrix() wrapper function from the *car* package.
 ```{r}
 scatterplotMatrix(~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean + Brain_Size_Female_Mean + Mass_Dimorphism| Family, data=d,legend = TRUE,smooth = list(method=gamLine),diagonal = TRUE,plot.points = TRUE)
 ```
