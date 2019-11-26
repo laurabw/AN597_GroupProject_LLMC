@@ -116,7 +116,6 @@ Load in the USA Arrests dataset, which shows number of arrests per 100,000 resid
 
 [prison mike from the office gif](https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif)
 >>>>>>> 8349562f7e8ad91010197610e4c0027410a87a70
-
 ```{r}
 df<- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/USArrests_data_NEW.csv")
 crimes<- read.csv(df, header = T, sep = ",", stringsAsFactors = T)
