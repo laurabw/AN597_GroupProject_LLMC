@@ -320,3 +320,174 @@ Load in the USA Arrests dataset, which shows number of arrests per 100,000 resid
 
 <img src = "https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif">
 
+```{r}
+library(curl)
+df<- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/USArrests_data_NEW.csv")
+crimes<- read.csv(df, header = T, sep = ",", stringsAsFactors = T)
+head(crimes)
+```
+
+Let's assign our 50 states to 6 different geographical regions for the purpose of this analysis.
+
+```{r}
+crimes$region <- "temp" #creating a new variable name
+
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(7, 8, 19, 20, 21, 29, 30, 32, 38, 39, 45)] <- "Northeast"
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(1, 4, 9, 10, 18, 24, 33, 40, 42, 46, 48)] <- "Southeast"
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(3, 31, 36, 43)] <- "Southwest"
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(5, 6, 12, 26, 28, 37, 44, 47, 50)] <- "West"
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(13, 14, 15, 16, 17, 22, 23, 25, 27, 34, 35, 41, 49)] <- "Midwest"
+crimes$region[row(data.frame(levels(crimes$State))) %in% c(2, 11)] <- "Noncontiguous"
+crimes$region <- as.factor(crimes$region)
+levels(crimes$region)
+```
+
+### Data exploration: What are we looking at?
+
+Let's explore our data a bit and view each variable separately across the 6 regions
+
+```{r}
+par(mfrow = c(2,2))
+par(xaxt = "n") #this just removes the built in x-axis labels so that we can insert our own and put them on an angle
+lablist<-as.vector(c("MW", "NC", "NE", "SE", "SW", "W")) #our new x-axis labels
+
+plot(data= crimes, Murder ~ region, xlab= "Region")
+axis(1, at=seq(1, 6, by=1), labels = FALSE)
+text(seq(1, 6, by=1), par("usr")[1] - 0.2, labels = lablist, srt = 45, pos = 1, xpd = TRUE) #this code is just for the positioning of our new x-axis labels 
+
+plot(data= crimes, Assault ~ region, xlab= "Region")
+axis(1, at=seq(1, 6, by=1), labels = FALSE)
+text(seq(1, 6, by=1), par("usr")[2] - 0.2, labels = lablist, srt = 45, pos = 1, xpd = TRUE)
+
+plot(data= crimes, UrbanPop ~ region, xlab= "Region")
+axis(1, at=seq(1, 6, by=1), labels = FALSE)
+text(seq(1, 6, by=1), par("usr")[3] - 0.2, labels = lablist, srt = 45, pos = 1, xpd = TRUE)
+
+plot(data= crimes, Burglary ~ region, xlab= "Region")
+axis(1, at=seq(1, 6, by=1), labels = FALSE)
+text(seq(1, 6, by=1), par("usr")[2] - 0.2, labels = lablist, srt = 45, pos = 1, xpd = TRUE)
+```
+
+We should probably test for normality and see what we're working with. Since we have a multivariate dataset, we can use the **Shapiro-Wilk multivariate normality test** (conveniently, there is a built in package for this in the "mvnormtest" package).
+
+Let's create a matrix that has all of our dependent variables:
+
+```{r}
+library(mvnormtest)
+crimes_matrix<- cbind(crimes$Murder, crimes$Assault, crimes$UrbanPop, crimes$Burglary)
+
+#The mshapiro.test() requires that the dependent variables be in rows and the independent variables be in columns, the function t() solves this
+crimes_matrix_t<- t(crimes_matrix)  
+mshapiro.test(crimes_matrix_t)
+```
+
+This p-value from this test is <0.05 which means technically our data is **not** normally distributed. Normality and homogeneity assumptions are not always considered *absolute* prerequisites for CDA so for the purpose of this module we will continue with this dataset. However, note that you should try to normalize your data beforehand in most cases! 
+
+### Next Steps: Running a MANOVA
+
+In order to investigate between-group differences of multivariate data, we can use multivariate analysis of variance, or MANOVA. Remember, ANOVA only looks at 1 response/dependent variable and tests for the difference in means across two or more groups. MANOVA extends this analysis to **several dependent variables** and tests for the difference in two or more vectors of means. For the purpose of the CDA, a MANOVA is the most appropriate approach. CDA then shows *visual descriptions of differences* between the groups that a simple MANOVA does not.
+
+```{r}
+colnames(crimes_matrix)= c("Murder", "Assault", "Urban Population", "Blurglary") #setting column names in our matrix now will allow for better visualize with our CDA plot
+crimes_manova<- manova(data= crimes, crimes_matrix ~ region)
+summary(crimes_manova)
+```
+
+Great! we can see that there is a significant difference in the means of our variables across the 6 regions. To look at the differences more closely, let's quickly run an ANOVA summary...
+
+```{r}
+summary.aov(crimes_manova)
+```
+
+There is a significant difference in the mean number of murders, assaults, and burglaries across the regions but not in the percentage of people living in urban areas.
+
+### CDA time!
+
+```{r}
+library(candisc)
+crimes_CDA<- candisc(crimes_manova)
+summary(crimes_CDA)
+```
+
+The summary() function with our CDA object shows us the standardized canonical coefficients for the first two dimensions across our dependent variables. The canonical coefficients yield relative information on each variable in distinguishing between groups. Each canonical dimension is most strongly influenced by the variable(s) with the **greatest absolute value coefficients**.
+
+We can see that **CDF1** is most strongly influenced by the Murder and Burglary variables while **CDF2** is most strongly influenced by Assault and Burglary.
+
+### Let's plot this sucker!
+
+```{r}
+par(mfrow = c(1,1))
+heplot(crimes_CDA, term = "region") 
+```
+
+Overall, we can see that the mean number of arrests for murder and assault in 1973 is most strongly associated with the southeast region of the United States. Arrests for burglary are most strongly associated with the noncontiguous states, Hawaii and Alaksa. Remember that our ANOVA showed that the percentage of people living in urban areas was not significantly different across the regions. Therefore, there is a weak association of UrbanPop with any of the regions in our CDA plot. In addition, the further away variables are from the "Error" circle, the stronger the association. Therefore, we see that the northeast, midwest, and southwest regions are not strongly associated with any of our response variables. 
+
+### CDA CHALLENGE 
+
+<img src = "https://media.giphy.com/media/QxZ0nbcVgMlPlnfZos/giphy.gif">
+
+Load in the built-in R dataset "Wine" in the candisc package, which contains the results of a chemical analysis of three types of wine, Barolo, Grignolino, and Barbera (all red wine), grown in a specific area of Italy.
+
+```{r}
+data("Wine")
+head(Wine)
+levels(Wine$Cultivar) #these are the categories of our independent variable... the three types of wine
+```
+
+Since this dataset is also not normally distributed, we are going to use the log transformation of the **most** normally distributed variables: Alcohol, Akalinity of Ash, and Color. 
+
+```{r}
+par(mfrow = c(1,2))
+hist(log(Wine$Alcohol))
+qqnorm(log(Wine$Alcohol))
+
+hist(log(Wine$AlcAsh))
+qqnorm(log(Wine$AlcAsh))
+
+hist(log(Wine$Color))
+qqnorm(log(Wine$Color))
+```
+
+Plot these log transformed variables against the Cultivar variable. 
+
+```{r}
+par(mfrow = c(2,2))
+par(xaxt = "s") #since we removed the x-axis above, we need this code to add them back in
+plot(data = Wine, log(Alcohol) ~ Cultivar) 
+plot(data = Wine, log(AlcAsh) ~ Cultivar)
+plot(data = Wine, log(Color) ~ Cultivar)
+```
+
+Create a log transformed matrix containing these variables. 
+
+```{r}
+wine_matrix<- cbind(Wine$Alcohol, Wine$AlcAsh, Wine$Color)
+log_wine_matrix<- log(wine_matrix) #log transforming the matrix
+```
+
+Name the columns of the matrix and run the appropriate MANOVA to use for this CDA analysis. What does the MANOVA tell us? How can you tell which variables are significantly different across the three types of wine?
+
+```{r}
+colnames(log_wine_matrix) = c("Alcohol", "Alkalinity of Ash", "Color")
+log_wine_manova<- manova(data = Wine, log_wine_matrix ~ Cultivar)
+summary(log_wine_manova)
+summary.aov(log_wine_manova)
+```
+
+Run the CDA and investigate which variables most strongly influence the first two CDFs then plot it. 
+
+```{r}
+log_wine_CDA<- candisc(log_wine_manova)
+summary(log_wine_CDA)
+
+par(mfrow= c(1,1))
+heplot(log_wine_CDA, term = "Cultivar")
+```
+
+Let's add some color!
+
+```{r}
+myColors <- hsv((c(0,120,240) + 80)/360,s = 0.9,v = 0.8,0.7) #creating a vector for the colors
+plot(log_wine_CDA, col = myColors, pch = rep(16,20), xpd = T)
+```
+
