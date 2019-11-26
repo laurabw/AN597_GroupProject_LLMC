@@ -67,7 +67,7 @@ But why would we ever do this by hand when we have the lovely lda() function in 
 
 <img src = "https://www.lostandfoundnature.com/wp-content/uploads/Blog/Spreadwing_damselfly/Lagothrix-flavicauda-yellow-tailed-woolly-monkey-Andrew-WalmsleyNPC-3-1024x680.jpg">
 
-# LDA CHALLENGE
+### LDA CHALLENGE
 
 Packages we need: 
 ```{r}
@@ -115,7 +115,7 @@ table(lda.predict.class, d[,2])
 This is a cross-tabulation of the real families and the predicted families. This basically is saying how many "Atelidae" were predicted to be "Atelidae" and so on. Based off of our table, our's is okay but not great. Only 6/12 Atelidae were correctly classified and 6 Cercopithecidae were misclassified as Atelidae. 
  
  
-##Visualize LDA 
+### Visualize LDA 
  
 One way we can visualize the output of the LDA is to plot the predicted linear discriminants for each family on stacked histograms.
  
@@ -159,7 +159,7 @@ ggplot(newdata.3) + geom_point(aes(lda.LD1, lda.LD2, colour = Family), size = 2.
 
 So with all of these variables, we are able to say that body mass and brain size can describe Cebidae out of these three families, but not the other two because they are too similar. 
 
-## Quadratic Discriminant Analysis (QDA)
+# Quadratic Discriminant Analysis (QDA)
 
 Just like ANOVA, Linear Discriminant Analyses(LDA) assumes equal variance between our input variables. If the data fails to meet this criteria, observation are more likely to be assigned to the class showing the greatest variability. This type of bias error is the reason the Quadratic Discriminant Analysis (QDA) was invented. In other words, *LDA* and *QDA* are both classification technique but, *QDA* is less conservative by allowing different variance matrices for different classes. Another key difference between *LDA* and *QDA* is that the former assigns a linear classification decision boundary while the later leads to a quadratic decision boundary.
 
@@ -192,9 +192,9 @@ library(car)
 ```
 
 
-# QDA CHALLENGE
+### QDA CHALLENGE
 
-Similar to what we did for LDA, we will now try to use QDA to try to determine which of variable or combination of variables will give us the best predictor model for which of the three families of primates individuals belong to. Our data was already loaded in earlier in the module but here it is in case you need it again.
+Similar to what we did for LDA, we will now try to use QDA to try to determine which variable or combination of variables will give us the best predictor model for which of the three families of primates an individual belongs. Our data was already loaded in earlier in the module but here it is in case you need it again.
 
 ```{r}
 f <- curl("https://raw.githubusercontent.com/laurabw/AN597_GroupProject_LLMC/master/kamcoop.simplified.2.csv")
@@ -223,7 +223,7 @@ kamcoop.qda <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_
 kamcoop.qda
 ```
 
-#QDA Partition Plots
+### QDA Partition Plots
 
 Next we can use the partimat() function from the *klaR* package which allows us to plot the results of the *QDA*. This will create a figure for every possible combination of two variables from our data. 
 
@@ -233,7 +233,7 @@ partimat(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Speci
 
 Think of each of these plots as a different prespective on our data. The different colored regions outline each classification area. Observation that falls within a region is predicted to be from a specific class. The apparent error rate at the top of each figure imforms us about how many observations fall outside their predicted range.
 
-#QDA Predictions
+### QDA Predictions
 
 The predict function works identically to the way we used it for *LDA*. We will again use this function to create a confusion matrix for our data.
 
@@ -254,7 +254,7 @@ table(qda.predict.class, d[,2])
 
 Our model correctly predicted the correct family 100% of the time. This appears to be more accurate than the LDA model using mean male and female body mass only. However, we should also test simpler models to see if we get similar results. As we learned this semester simpler is better when it comes to modeling.
 
-Lets test some other modeling options!
+Let's test some other modeling options!
 
 Removing Mass_Dimorphism:
 ```{r}
@@ -267,7 +267,7 @@ table(qda.predict.class1, d[,2])
 ``` 
 Still looking good!
 
-Now lets try without Mass_Dimorphism and Brain_Size_Female_Mean:
+Now let's try without Mass_Dimorphism and Brain_Size_Female_Mean:
 ```{r}
 kamcoop.qda2 <- qda(Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean, data = d) 
 qda.predict.class2 <- predict(kamcoop.qda2,
@@ -289,7 +289,7 @@ table(qda.predict.class3, d[,2])
 ```
 And now we see we are starting to lose accuracy.
 
-One more combo just for the sake of being thorough without body mas or sexual dimorphism:
+One more combo just for the sake of being thorough without body mass or sexual dimorphism:
 ```{r}
 kamcoop.qda4 <- qda(Family ~ Brain_Size_Species_Mean + Brain_Size_Female_Mean, data = d) 
 qda.predict.class4 <- predict(kamcoop.qda4,
@@ -305,5 +305,17 @@ It looks as though our best and simplest model is:
 Family ~ Body_mass_male_mean + Body_mass_female_mean + Brain_Size_Species_Mean
 
 As such, we can use this model and QDA to predict how an unknown sample should be classified into one of our three Families of primates.
+
+# Canonical Discriminant Analysis (CDA)
+
+Canonical discriminant analysis (CDA) is a multivariate statistical technique that identifies differences among groups of treatments (the independent variables) and shows us the relationships between the various (dependent) variables within those groups. CDA determines the best way to discriminate the treatment groups from each other using quantitative measurements of all the variables within each group.
+
+Running the CDA yields several **uncorrelated** canonical discriminant functions (CDFs). These linear combinations of the variables best separate the original treatment group means relative to within group variation. A lack of correlation between all of the CDFs allows each one to pull out a completely new dimension of information from the groups and variables. CDF1 shows the maximum possible variations among groups, therefore yielding the greatest degree of group differences. CDF1 and CDF2 are completely uncorrelated so CDF2 will reflect differences not shown in CDF1. Similarly, CDF1 and CDF2 are uncorrelated to CDF3, which reflects its own unique differences between groups.
+
+Time to load in some data! To all my true crime lovers out there...
+
+<img src = "https://media.giphy.com/media/9VnK7N0jOB1zBGFrfE/giphy.gif">
+
+Load in the USA Arrests dataset, which shows number of arrests per 100,000 residents for assault, murder, and burglary in each of the 50 US states in 1973 as well as the percentage of residents living in urban areas in each state. (This dataset has been modified)
 
 <img src = "https://media.giphy.com/media/Q4r9RDlu5Si0o/giphy.gif">
